@@ -1,0 +1,8 @@
+{
+  "domain": "technicolor",
+  "name": "Techincolor modem sensor",
+  "documentation": "https://github.com/Barrysv/technicolor",
+  "dependencies": [],
+  "codeowners": [],
+  "requirements": ["paramiko==2.4.2"]
+}
