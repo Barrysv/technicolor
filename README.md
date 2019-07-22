@@ -3,7 +3,8 @@ Technicolor modem sensor for home assistant
 
 Rewrote this sensor completely.  It connects to the modem using the paramiko ssh python library and fetches the modem stats by running the XDSLCTL command.
 
-This means it should be able to work with pretty much any modem that can be connected to via SSH and can run this command.  By changing the Regex strings it should be possible to extract from any modem that uses a different command and provides the data in a differing format.  The best thing is - it should work fine with the same type of modem with different firmware as long as it uses the broadcom hardware.
+This means it should be able to work with pretty much any modem that can be connected to via SSH and can run this command.  By changing the Regex and cmd strings it should be possible to extract from any modem that uses a different command and has a differing output format.  It should be robust for all modems of the same family although have only used it with my TG789vac V2.  Please submit a pull request if you would like to support additional modems.
+
 
 HOW TO INSTALL:
 1. Clone into .homeassistant/custom-components/technicolor
