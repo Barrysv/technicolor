@@ -72,7 +72,7 @@ HOW TO INSTALL:
       value_template: '{{ states.sensor.modem.attributes.SES_down }}'
 ```
 
-3. Use Groups to customise these into a card - in my groups.yaml:
+3. Use Groups / lovelace to customise these into a card:
 ```
 system_status:
   name: System
