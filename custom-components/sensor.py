@@ -1,7 +1,7 @@
 """
 Technicolor Modem sensor for Home Assistant
 For more details about this platform, please refer to the documentation at
-https://github.com/barrysv/techni
+https://github.com/barrysv/technicolor
 Barry Vayler
 """
 
@@ -102,7 +102,6 @@ class FetchTechnicolorModemStats(object):
         self._regex_totaltime = r"Total time = (.*)"
         self._regex_prev15 = r"Previous 15 minutes.*\nFEC:\t\t(\d+)\t\t(\d+)\nCRC:\t\t(\d+)\t\t(\d+)\nES:\t\t(\d+)\t\t(\d+)\nSES:\t\t(\d+)\t\t(\d+)"
         self._regex_sincelinktime = r"Since Link time = (\d.*)\nFEC:\t\t(\d+)\t\t(\d+)\nCRC:\t\t(\d+)\t\t(\d+)\nES:\t\t(\d+)\t\t(\d+)\nSES:\t\t(\d+)\t\t(\d+)"
-        self._connected = False
         #hostkey = paramiko.util.load_host_keys(os.path.expanduser("~/.ssh/known_hosts"))
         self._ssh = paramiko.SSHClient()
         self._ssh.set_missing_host_key_policy(paramiko.WarningPolicy())
