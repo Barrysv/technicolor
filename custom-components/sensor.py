@@ -119,6 +119,7 @@ class FetchTechnicolorModemStats(object):
     def _connect(self):
         try:
             self._ssh.connect(self._config['address'], username = self._config['username'], password = self._config['password'])
+            self._ssh.get_transport().set_keepalive(60)
         except:
             _LOGGER.error("SSH connection refused by host {}".format(self._config['address']))
             self._disconnect()
