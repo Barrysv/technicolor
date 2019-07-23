@@ -109,9 +109,9 @@ class FetchTechnicolorModemStats(object):
         self._connect()
     
     def get(self,res):
-        if not self._ssh.get_transport().active:
+        if not self._ssh.get_transport().is_active():
             self._connect()
-        if not self._ssh.get_transport().active:
+        if not self._ssh.get_transport().is_active():
             return None
         self.run_xdslctl()
         self.parsedata(res)    
