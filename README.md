@@ -70,6 +70,22 @@ HOW TO INSTALL:
       friendly_name: 'Severely Errored seconds down'
       unit_of_measurement: 'seconds'
       value_template: '{{ states.sensor.modem.attributes.SES_down }}'
+    attn_up:
+      friendly_name: 'Line Attenuation up'
+      unit_of_measurement: 'dB'
+      value_template: '{{ states.sensor.modem.attributes.attn_up }}'
+    attn_down:
+      friendly_name: 'Line Attenuation down'
+      unit_of_measurement: 'dB'
+      value_template: '{{ states.sensor.modem.attributes.attn_down }}'
+    power_up:
+      friendly_name: 'Line Power up'
+      unit_of_measurement: 'dBm'
+      value_template: '{{ states.sensor.modem.attributes.up_power }}'
+    power_down:
+      friendly_name: 'Line Power down'
+      unit_of_measurement: 'dBm'
+      value_template: '{{ states.sensor.modem.attributes.down_power }}'
 ```
 
 3. Use Groups / lovelace to customise these into a card:
@@ -91,5 +107,8 @@ system_status:
     - sensor.es_up
     - sensor.ses_down
     - sensor.ses_up
-
+    - sensor.attn_down
+    - sensor.attn_up
+    - sensor.power_down
+    - sensor.power_up
 ```
