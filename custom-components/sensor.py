@@ -113,7 +113,7 @@ class FetchTechnicolorModemStats(object):
             self._connect()
         elif not self._ssh.get_transport().is_active(): # if we have a channel but it is not active
             self._connect()
-        if not self._ssh.get_transport().is_active():   # if we were not able to connect to the modem
+        if not self._ssh.get_transport():               # if we were not able to connect to the modem at all
             return None
         self.run_xdslctl()
         self.parsedata(res)    
