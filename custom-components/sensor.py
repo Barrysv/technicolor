@@ -82,9 +82,10 @@ class TechnicolorModemSensor(Entity):
         stats = OrderedDict()
         self._modemFetcher.get(stats)
         self._available = len(stats) > 0
-        self._attributes = dict(stats)
-        self._state = stats['dsl_status']
-        
+        if self._available:
+            self._attributes = dict(stats)
+            self._state = stats['dsl_status']
+
 class FetchTechnicolorModemStats(object):
     def __init__(self, config):
         import paramiko, os
