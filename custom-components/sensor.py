@@ -1,7 +1,7 @@
 """
 Technicolor Modem sensor for Home Assistant
 For more details about this platform, please refer to the documentation at
-https://github.com/barrysv/technicolor
+https://github.com/barrysv/techni
 Barry Vayler
 """
 
@@ -82,10 +82,9 @@ class TechnicolorModemSensor(Entity):
         stats = OrderedDict()
         self._modemFetcher.get(stats)
         self._available = len(stats) > 0
-        if self._available:
-            self._attributes = dict(stats)
-            self._state = stats['dsl_status']
-
+        self._attributes = dict(stats)
+        self._state = stats['dsl_status']
+        
 class FetchTechnicolorModemStats(object):
     def __init__(self, config):
         import paramiko, os
@@ -103,6 +102,7 @@ class FetchTechnicolorModemStats(object):
         self._regex_totaltime = r"Total time = (.*)"
         self._regex_prev15 = r"Previous 15 minutes.*\nFEC:\t\t(\d+)\t\t(\d+)\nCRC:\t\t(\d+)\t\t(\d+)\nES:\t\t(\d+)\t\t(\d+)\nSES:\t\t(\d+)\t\t(\d+)"
         self._regex_sincelinktime = r"Since Link time = (\d.*)\nFEC:\t\t(\d+)\t\t(\d+)\nCRC:\t\t(\d+)\t\t(\d+)\nES:\t\t(\d+)\t\t(\d+)\nSES:\t\t(\d+)\t\t(\d+)"
+        self._connected = False
         #hostkey = paramiko.util.load_host_keys(os.path.expanduser("~/.ssh/known_hosts"))
         self._ssh = paramiko.SSHClient()
         self._ssh.set_missing_host_key_policy(paramiko.WarningPolicy())
@@ -110,11 +110,9 @@ class FetchTechnicolorModemStats(object):
         self._connect()
     
     def get(self,res):
-        if not self._ssh.get_transport():               # if we don't have a channel at all  
+        if not self._ssh.get_transport():
             self._connect()
-        elif not self._ssh.get_transport().is_active(): # if we have a channel but it is not active
-            self._connect()
-        if not self._ssh.get_transport():               # if we were not able to connect to the modem at all
+        if not self._ssh.get_transport():
             return None
         self.run_xdslctl()
         self.parsedata(res)    
@@ -122,7 +120,6 @@ class FetchTechnicolorModemStats(object):
     def _connect(self):
         try:
             self._ssh.connect(self._config['address'], username = self._config['username'], password = self._config['password'])
-            self._ssh.get_transport().set_keepalive(60)
         except:
             _LOGGER.error("SSH connection refused by host {}".format(self._config['address']))
             self._disconnect()
