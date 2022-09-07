@@ -8,6 +8,7 @@ Barry Vayler
 from collections import OrderedDict
 import logging
 import voluptuous as vol
+import re
 
 from homeassistant.const import (
     STATE_UNKNOWN, CONF_NAME, CONF_PASSWORD, CONF_USERNAME,
@@ -82,8 +83,9 @@ class TechnicolorModemSensor(Entity):
         stats = OrderedDict()
         self._modemFetcher.get(stats)
         self._available = len(stats) > 0
-        self._attributes = dict(stats)
-        self._state = stats['dsl_status']
+        if self._available:
+            self._attributes = dict(stats)
+            self._state = stats['dsl_status']
         
 class FetchTechnicolorModemStats(object):
     def __init__(self, config):
@@ -93,16 +95,17 @@ class FetchTechnicolorModemStats(object):
         self._stderr = None
         self._errorcode = None
         self._cmd = 'xdslctl info --stats'
-        self._regex_dsl_status = r"Status: (.*)"
-        self._regex_max_up_down = r"Max:.*Upstream rate = (\d+).*Downstream rate = (\d+)"
-        self._regex_act_up_down = r"Bearer:\t0.*Upstream rate = (\d+).*Downstream rate = (\d+)"
-        self._regex_snr_up_down = r"SNR..dB.*?(\d+\.\d+)\t\t.(\d+\.\d+)"
-        self._regex_attn_up_down = r"Attn.dB.*?(\d+\.\d+)\t\t.(\d+\.\d+)"
-        self._regex_pwr_up_down = r"Pwr.dB.*?(\d+\.\d+)\t\t.(\d+\.\d+)"
-        self._regex_totaltime = r"Total time = (.*)"
-        self._regex_prev15 = r"Previous 15 minutes.*\nFEC:\t\t(\d+)\t\t(\d+)\nCRC:\t\t(\d+)\t\t(\d+)\nES:\t\t(\d+)\t\t(\d+)\nSES:\t\t(\d+)\t\t(\d+)"
-        self._regex_sincelinktime = r"Since Link time = (\d.*)\nFEC:\t\t(\d+)\t\t(\d+)\nCRC:\t\t(\d+)\t\t(\d+)\nES:\t\t(\d+)\t\t(\d+)\nSES:\t\t(\d+)\t\t(\d+)"
+        self._regex_dsl_status = re.compile(r"Status: (.*)")
+        self._regex_max_up_down = re.compile(r"Max:.*Upstream rate = (\d+).*Downstream rate = (\d+)")
+        self._regex_act_up_down = re.compile(r"Bearer:\t0.*Upstream rate = (\d+).*Downstream rate = (\d+)")
+        self._regex_snr_up_down = re.compile(r"SNR..dB.*?(\d+\.\d+)\t\t.(\d+\.\d+)")
+        self._regex_attn_up_down = re.compile(r"Attn.dB.*?(\d+\.\d+)\t\t.(\d+\.\d+)")
+        self._regex_pwr_up_down = re.compile(r"Pwr.dB.*?(\d+\.\d+)\t\t.(\d+\.\d+)")
+        self._regex_totaltime = re.compile(r"Total time = (.*)")
+        self._regex_prev15 = re.compile(r"Previous 15 minutes.*\nFEC:\t\t(\d+)\t\t(\d+)\nCRC:\t\t(\d+)\t\t(\d+)\nES:\t\t(\d+)\t\t(\d+)\nSES:\t\t(\d+)\t\t(\d+)")
+        self._regex_sincelinktime = re.compile(r"Since Link time = (\d.*)\nFEC:\t\t(\d+)\t\t(\d+)\nCRC:\t\t(\d+)\t\t(\d+)\nES:\t\t(\d+)\t\t(\d+)\nSES:\t\t(\d+)\t\t(\d+)")
         self._connected = False
+        self._regex_up_seconds = re.compile(r"(?:(\d+)\sdays\s)?(?:(\d+)\shours\s)?(?:(\d+)\smin\s)?(\d+)\ssec")
         #hostkey = paramiko.util.load_host_keys(os.path.expanduser("~/.ssh/known_hosts"))
         self._ssh = paramiko.SSHClient()
         self._ssh.set_missing_host_key_policy(paramiko.WarningPolicy())
@@ -112,6 +115,8 @@ class FetchTechnicolorModemStats(object):
     def get(self,res):
         if not self._ssh.get_transport():
             self._connect()
+        elif not self._ssh.get_transport().is_active():
+            self._connect()
         if not self._ssh.get_transport():
             return None
         self.run_xdslctl()
@@ -120,6 +125,7 @@ class FetchTechnicolorModemStats(object):
     def _connect(self):
         try:
             self._ssh.connect(self._config['address'], username = self._config['username'], password = self._config['password'])
+            self._ssh.get_transport().set_keepalive(60)
         except:
             _LOGGER.error("SSH connection refused by host {}".format(self._config['address']))
             self._disconnect()
@@ -134,15 +140,15 @@ class FetchTechnicolorModemStats(object):
        
     def parsedata(self,res):
         import re
-        matches_dsl_status = re.search(self._regex_dsl_status, self._data)
-        matches_max_up_down = re.search(self._regex_max_up_down, self._data)
-        matches_act_up_down = re.search(self._regex_act_up_down, self._data)
-        matches_snr_up_down = re.search(self._regex_snr_up_down, self._data)
-        matches_attn_up_down = re.search(self._regex_attn_up_down, self._data)
-        matches_pwr_up_down = re.search(self._regex_pwr_up_down, self._data)
-        matches_modem_uptime = re.search(self._regex_totaltime, self._data)
-        matches_sincelinktime = re.search(self._regex_sincelinktime, self._data)
-        #matches_prev15 = re.search(self._regex_prev15, self._data)
+        matches_dsl_status = self._regex_dsl_status.search(self._data)
+        matches_max_up_down = self._regex_max_up_down.search(self._data)
+        matches_act_up_down = self._regex_act_up_down.search(self._data)
+        matches_snr_up_down = self._regex_snr_up_down.search(self._data)
+        matches_attn_up_down = self._regex_attn_up_down.search(self._data)
+        matches_pwr_up_down = self._regex_pwr_up_down.search(self._data)
+        matches_modem_uptime = self._regex_totaltime.search(self._data)
+        matches_sincelinktime = self._regex_sincelinktime.search(self._data)
+        #matches_prev15 = self._regex_prev15.search(self._data)
 
         def getmatches(matches,n):
             if len(matches.groups()) == n:
@@ -159,3 +165,6 @@ class FetchTechnicolorModemStats(object):
         res['modem_uptime'], = getmatches(matches_modem_uptime, 1)
         res['dsl_uptime'], res['FEC_down'], res['FEC_up'], res['CRC_down'], res['CRC_up'], \
           res['ES_down'], res['ES_up'], res['SES_down'], res['SES_up'] = getmatches(matches_sincelinktime, 9)
+        matches = self._regex_up_seconds.findall(res['dsl_uptime'])[0]
+        res['uptime_seconds'] = sum([int('0'+matches[i]) * [86400,3600,60,1][i] for i in range(len(matches))])
+
