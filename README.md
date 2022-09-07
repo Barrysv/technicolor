@@ -112,3 +112,4 @@ system_status:
     - sensor.power_down
     - sensor.power_up
 ```
+![Home assistant dashboard](/assets/images/Screenshot 2022-09-07 at 4.07.04 pm.png)
