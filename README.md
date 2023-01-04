@@ -10,7 +10,8 @@ HOW TO INSTALL:
 1. Either;
 a. add this repository's URL to HACS as a custom integration repository, and download using HACS, or
 b. copy the contents of /custom_components/xdslctl into .homeassistant/custom_components/xdslctl
-2. in your sensors.yaml file include the following.
+then restart Home Assistant to load the integration
+2. in your sensors.yaml file include the following (or merge into your configuration.yaml if you have not split out your sensor config)
 ```
 - platform: xdslctl
   name: modem
