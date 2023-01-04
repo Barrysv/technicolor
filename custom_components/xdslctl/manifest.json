@@ -1,5 +1,5 @@
-{ "domain": "xdslctl",  
- "name": "xdslctl modem sensor", 
+{"domain": "xdslctl",  
+ "name": "Xdslctl Modem Sensor", 
  "version":"2.1.0", "documentation": "https://github.com/Barrysv/technicolor",  
  "dependencies": [],  "codeowners": ["@barrysv"],  
  "requirements":["paramiko==2.11.0"],   
