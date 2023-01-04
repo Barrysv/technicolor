@@ -1,5 +1,5 @@
-# technicolor
-Technicolor modem sensor for home assistant
+# HA-xdslctl
+Modem sensor for Home Assistant using xdslctl command via SSH
 
 Rewrote this sensor completely.  It connects to the modem using the paramiko ssh python library and fetches the modem stats by running the XDSLCTL command.
 
@@ -7,10 +7,10 @@ This means it should be able to work with pretty much any modem that can be conn
 
 
 HOW TO INSTALL:
-1. Clone into .homeassistant/custom-components/technicolor
+1. Clone into .homeassistant/custom_components
 2. in your sensors.yaml file include the following.
 ```
-- platform: technicolor
+- platform: xdslctl
   name: modem
   host: 10.1.1.1                   # IP address of the modem
   username: !secret modem_username # use root instead of admin
@@ -112,4 +112,4 @@ system_status:
     - sensor.power_down
     - sensor.power_up
 ```
-![Home assistant dashboard](/assets/images/Screenshot 2022-09-07 at 4.07.04 pm.png)
+![Home assistant dashboard](/assets/images/Screenshot%202022-09-07%20at%204.07.04%20pm.png)

@@ -1,1 +1,1 @@
-"""Technicolor modem sensor"""
+"""xdslctl modem sensor"""
