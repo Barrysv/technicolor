@@ -1,4 +1,4 @@
-# Home Assistant VDSL modem sensor custom integration
+# Home Assistant VDSL modem sensor integration
 Modem sensor for Home Assistant using xdslctl command via SSH
 
 Rewrote this sensor completely.  It connects to the modem using the paramiko ssh python library and fetches the modem stats by running the XDSLCTL command.
@@ -7,7 +7,9 @@ This means it should be able to work with pretty much any modem that can be conn
 
 
 HOW TO INSTALL:
-1. Copy the contents of /custom_components/xdslctl into .homeassistant/custom_components/xdslctl
+1. Either;
+a. add this repository's URL to HACS as a custom integration repository, and download using HACS, or
+b. copy the contents of /custom_components/xdslctl into .homeassistant/custom_components/xdslctl
 2. in your sensors.yaml file include the following.
 ```
 - platform: xdslctl
