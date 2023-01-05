@@ -7,11 +7,11 @@ This means it should be able to work with pretty much any modem that can be conn
 
 
 HOW TO INSTALL:
-1. Either;
-a. add this repository's URL to HACS as a custom integration repository, and download using HACS, or
-b. copy the contents of /custom_components/xdslctl into .homeassistant/custom_components/xdslctl
+1. *Either*;  
+   - add this repository's URL to HACS as a custom integration repository, and download using HACS, *or*  
+   - copy the contents of /custom_components/xdslctl into .homeassistant/custom_components/xdslctl  
 then restart Home Assistant to load the integration
-2. in your sensors.yaml file include the following (or merge into your configuration.yaml if you have not split out your sensor config)
+2. in your sensors.yaml file include the following (*or* merge into your configuration.yaml)
 ```
 - platform: xdslctl
   name: modem
