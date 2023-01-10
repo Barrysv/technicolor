@@ -166,5 +166,6 @@ class FetchXdslctlModemStats(object):
         res['dsl_uptime'], res['FEC_down'], res['FEC_up'], res['CRC_down'], res['CRC_up'], \
           res['ES_down'], res['ES_up'], res['SES_down'], res['SES_up'] = getmatches(matches_sincelinktime, 9)
         matches = self._regex_up_seconds.findall(res['dsl_uptime'])[0]
-        res['uptime_seconds'] = sum([int('0'+matches[i]) * [86400,3600,60,1][i] for i in range(len(matches))])
-
+        res['dsl_uptime_secs'] = sum([int('0'+matches[i]) * [86400,3600,60,1][i] for i in range(len(matches))])
+        matches = self._regex_up_seconds.findall(res['modem_uptime'])[0]
+        res['modem_uptime_secs'] = sum([int('0'+matches[i]) * [86400,3600,60,1][i] for i in range(len(matches))])
