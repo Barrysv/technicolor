@@ -1,7 +1,7 @@
 """
-Technicolor Modem sensor for Home Assistant
+Modem sensor for Home Assistant using xdslctl command via SSH
 For more details about this platform, please refer to the documentation at
-https://github.com/barrysv/techni
+https://github.com/Barrysv/technicolor
 Barry Vayler
 """
 
@@ -17,7 +17,7 @@ from homeassistant.helpers.entity import Entity
 from homeassistant.components.sensor import PLATFORM_SCHEMA
 import homeassistant.helpers.config_validation as cv
 
-DEFAULT_NAME = 'Technicolor Modem Sensor'
+DEFAULT_NAME = 'Xdslctl Modem Sensor'
 REQUIREMENTS = ['paramiko==2.4.2']
 
 _LOGGER = logging.getLogger(__name__)
@@ -31,11 +31,11 @@ PLATFORM_SCHEMA = PLATFORM_SCHEMA.extend({
 
 
 def setup_platform(hass, config, add_devices, discovery_info=None):
-    """Setup the technicolor modem sensor"""
+    """Setup the xdslctl modem sensor"""
     import paramiko #  hassio will get and install requirements
-    add_devices([TechnicolorModemSensor(config)], True)
+    add_devices([XdslctlModemSensor(config)], True)
     
-class TechnicolorModemSensor(Entity):
+class XdslctlModemSensor(Entity):
     """Representation of a modem Sensor."""
  
     def __init__(self, config):
@@ -49,7 +49,7 @@ class TechnicolorModemSensor(Entity):
         self._unit_of_measurement = None
         self._attributes = None
         self._available = False
-        self._modemFetcher = FetchTechnicolorModemStats({'address':address, 'username':username, 'password':password})
+        self._modemFetcher = FetchXdslctlModemStats({'address':address, 'username':username, 'password':password})
  
     @property
     def name(self):
@@ -87,7 +87,7 @@ class TechnicolorModemSensor(Entity):
             self._attributes = dict(stats)
             self._state = stats['dsl_status']
         
-class FetchTechnicolorModemStats(object):
+class FetchXdslctlModemStats(object):
     def __init__(self, config):
         import paramiko, os
         self._config = config
@@ -166,5 +166,6 @@ class FetchTechnicolorModemStats(object):
         res['dsl_uptime'], res['FEC_down'], res['FEC_up'], res['CRC_down'], res['CRC_up'], \
           res['ES_down'], res['ES_up'], res['SES_down'], res['SES_up'] = getmatches(matches_sincelinktime, 9)
         matches = self._regex_up_seconds.findall(res['dsl_uptime'])[0]
-        res['uptime_seconds'] = sum([int('0'+matches[i]) * [86400,3600,60,1][i] for i in range(len(matches))])
-
+        res['dsl_uptime_secs'] = sum([int('0'+matches[i]) * [86400,3600,60,1][i] for i in range(len(matches))])
+        matches = self._regex_up_seconds.findall(res['modem_uptime'])[0]
+        res['modem_uptime_secs'] = sum([int('0'+matches[i]) * [86400,3600,60,1][i] for i in range(len(matches))])

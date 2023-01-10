@@ -1,5 +1,5 @@
-# technicolor
-Technicolor modem sensor for home assistant
+# Home Assistant VDSL modem sensor integration
+Modem sensor for Home Assistant using xdslctl command via SSH
 
 Rewrote this sensor completely.  It connects to the modem using the paramiko ssh python library and fetches the modem stats by running the XDSLCTL command.
 
@@ -7,10 +7,12 @@ This means it should be able to work with pretty much any modem that can be conn
 
 
 HOW TO INSTALL:
-1. Clone into .homeassistant/custom-components/technicolor
-2. in your sensors.yaml file include the following.
+1. Do *either* of the following, then restart Home Assistant to load the integration;  
+   - add this repository's URL to HACS as a custom integration repository, and download using HACS, *or*  
+   - copy the contents of /custom_components/xdslctl into .homeassistant/custom_components/xdslctl  
+2. in your sensors.yaml file include the following (*or* merge into your configuration.yaml sensor: section)
 ```
-- platform: technicolor
+- platform: xdslctl
   name: modem
   host: 10.1.1.1                   # IP address of the modem
   username: !secret modem_username # use root instead of admin
@@ -19,71 +21,87 @@ HOW TO INSTALL:
 - platform: template
   sensors:
     up_rate:
-      friendly_name: 'Up rate'
-      unit_of_measurement: 'kbps'
-      value_template: '{{ states.sensor.modem.attributes.up_rate }}'
+      friendly_name: 'DSL Up Rate'
+      device_class: data_rate
+      unit_of_measurement: 'Mbit/s'
+      value_template: '{{ "%.2f" | format(states.sensor.modem.attributes.up_rate | float / 1000) }}'
     down_rate:
-      friendly_name: 'Down rate'
-      unit_of_measurement: 'kbps'
-      value_template: '{{ states.sensor.modem.attributes.down_rate }}'
-    dsl_uptime:
-      friendly_name: 'DSL uptime'
-      unit_of_measurement: 'days'
-      value_template: '{{ states.sensor.modem.attributes.dsl_uptime}}'
+      friendly_name: 'DSL Down Rate'
+      device_class: data_rate
+      unit_of_measurement: 'Mbit/s'
+      value_template: '{{ "%.2f"|format(states.sensor.modem.attributes.down_rate | float / 1000) }}'
+    modem_uptime_text:
+      friendly_name: 'Modem Uptime Text'
+      value_template: '{{ states.sensor.modem.attributes.modem_uptime }}'
+    dsl_uptime_text:
+      friendly_name: 'DSL Uptime Text'
+      value_template: '{{ states.sensor.modem.attributes.dsl_uptime }}'
+    dsl_uptime_days:
+      friendly_name: 'DSL Uptime Days'
+      device_class: duration
+      unit_of_measurement: 'd'
+      value_template: '{{ "%.2f"|format(states.sensor.modem.attributes.dsl_uptime_secs | float / 86400) }}'
+    modem_uptime_days:
+      friendly_name: 'Modem Uptime Days'
+      device_class: duration
+      unit_of_measurement: 'd'
+      value_template: '{{ "%.2f"|format(states.sensor.modem.attributes.modem_uptime_secs | float / 86400) }}'
     dsl_up_noisemargin:
-      friendly_name: 'DSL up noisemargin'
+      friendly_name: 'DSL Up Noisemargin'
       unit_of_measurement: 'dB'
       value_template: '{{ states.sensor.modem.attributes.up_noisemargin}}'
     dsl_down_noisemargin:
-      friendly_name: 'DSL down noisemargin'
+      friendly_name: 'DSL Down Noisemargin'
       unit_of_measurement: 'dB'
       value_template: '{{ states.sensor.modem.attributes.down_noisemargin}}'
     max_up_rate:
-      friendly_name: 'DSL max up rate'
-      unit_of_measurement: 'kbps'
-      value_template: '{{ states.sensor.modem.attributes.up_maxrate }}'
+      friendly_name: 'DSL Max Up Rate'
+      device_class: data_rate
+      unit_of_measurement: 'Mbit/s'
+      value_template: '{{ "%.2f"|format(states.sensor.modem.attributes.up_maxrate | float / 1000) }}'
     max_down_rate:
-      friendly_name: 'DSL max down rate'
-      unit_of_measurement: 'kbps'
-      value_template: '{{ states.sensor.modem.attributes.down_maxrate }}'
+      friendly_name: 'DSL Max Down Rate'
+      device_class: data_rate
+      unit_of_measurement: 'Mbit/s'
+      value_template: '{{ "%.2f"|format(states.sensor.modem.attributes.down_maxrate | float / 1000) }}'
     crc_up:
-      friendly_name: 'CRC up errors'
+      friendly_name: 'DSL Up Errors'
       unit_of_measurement: 'errors'
       value_template: '{{ states.sensor.modem.attributes.CRC_up }}'
     crc_down:
-      friendly_name: 'CRC down errors'
+      friendly_name: 'DSL Down Errors'
       unit_of_measurement: 'errors'
       value_template: '{{ states.sensor.modem.attributes.CRC_down }}'
     es_up:
-      friendly_name: 'Errored seconds up'
+      friendly_name: 'DSL Errored Seconds Up'
       unit_of_measurement: 'seconds'
       value_template: '{{ states.sensor.modem.attributes.ES_up }}'
     es_down:
-      friendly_name: 'Errored seconds down'
+      friendly_name: 'DSL Errored Seconds Down'
       unit_of_measurement: 'seconds'
       value_template: '{{ states.sensor.modem.attributes.ES_down }}'
     ses_up:
-      friendly_name: 'Severely Errored seconds up'
+      friendly_name: 'DSL Severely Errored Seconds Up'
       unit_of_measurement: 'seconds'
       value_template: '{{ states.sensor.modem.attributes.SES_up }}'
     ses_down:
-      friendly_name: 'Severely Errored seconds down'
+      friendly_name: 'DSL Severely Errored Seconds Down'
       unit_of_measurement: 'seconds'
       value_template: '{{ states.sensor.modem.attributes.SES_down }}'
     attn_up:
-      friendly_name: 'Line Attenuation up'
+      friendly_name: 'DSL Line Attenuation Up'
       unit_of_measurement: 'dB'
       value_template: '{{ states.sensor.modem.attributes.attn_up }}'
     attn_down:
-      friendly_name: 'Line Attenuation down'
+      friendly_name: 'DSL Line Attenuation Down'
       unit_of_measurement: 'dB'
       value_template: '{{ states.sensor.modem.attributes.attn_down }}'
     power_up:
-      friendly_name: 'Line Power up'
+      friendly_name: 'DSL Line Power Up'
       unit_of_measurement: 'dBm'
       value_template: '{{ states.sensor.modem.attributes.up_power }}'
     power_down:
-      friendly_name: 'Line Power down'
+      friendly_name: 'DSL Line Power Down'
       unit_of_measurement: 'dBm'
       value_template: '{{ states.sensor.modem.attributes.down_power }}'
 ```
@@ -112,4 +130,4 @@ system_status:
     - sensor.power_down
     - sensor.power_up
 ```
-![Home assistant dashboard](/assets/images/Screenshot 2022-09-07 at 4.07.04 pm.png)
+![Home assistant dashboard](/assets/images/Screenshot%202022-09-07%20at%204.07.04%20pm.png)

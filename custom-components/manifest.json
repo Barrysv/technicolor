@@ -1,7 +1,0 @@
-{ "domain": "technicolor",  
- "name": "Technicolor modem sensor", 
- "version":"1.0.0", "documentation": "https://github.com/Barrysv/technicolor",  
- "dependencies": [],  "codeowners": ["@barrysv"],  
- "requirements":["paramiko==2.11.0"],   
- "iot_class": "local_polling"
-}
